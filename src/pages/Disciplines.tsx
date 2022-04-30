@@ -29,6 +29,7 @@ function Disciplines() {
   const [terms, setTerms] = useState<TestByDiscipline[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const[searchbarResults, setSearchbarResults] = useState<string[]>([])
+  console.log(terms)
 
   function formatTests(tests: TestByDiscipline[]){
     const resultsArr: string[] = []
@@ -36,7 +37,7 @@ function Disciplines() {
       term.disciplines.forEach(discipline => {
         let str: string = `${discipline.name} - `
         discipline.teacherDisciplines[0].tests.forEach(test=>{
-          let str2: string = str + `${test.name}`
+          let str2: string = str + `${test.category.name} - ${test.name} - (${discipline.teacherDisciplines[0].teacher.name})`
           resultsArr.push(str2)
         })
       })

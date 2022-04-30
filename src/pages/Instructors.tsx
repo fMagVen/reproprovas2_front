@@ -3,6 +3,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Box,
   Button,
   Divider,
@@ -21,19 +22,35 @@ import api, {
 } from "../services/api";
 
 function Instructors() {
+
   const navigate = useNavigate();
   const { token } = useAuth();
   const [teachersDisciplines, setTeachersDisciplines] = useState<
     TestByTeacher[]
   >([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const[searchbarResults, setSearchbarResults] = useState<string[]>([])
   console.log(teachersDisciplines)
+
+  function formatTests(tests: TestByTeacher[]){
+    const resultsArr: string[] = []
+    tests.forEach(term=>{
+      let str1: string = `${term.teacher.name} - `
+      term.tests.forEach(test=>{
+          let str2: string = str1 + `${test.category.name} - ${test.name}`
+          resultsArr.push(str2)
+        })
+    })
+    setTeachersDisciplines(tests)
+    setSearchbarResults(resultsArr)
+  }
+
   useEffect(() => {
     async function loadPage() {
       if (!token) return;
 
       const { data: testsData } = await api.getTestsByTeacher(token);
-      setTeachersDisciplines(testsData.tests);
+      formatTests(testsData.tests);
       const { data: categoriesData } = await api.getCategories(token);
       setCategories(categoriesData.categories);
     }
@@ -42,9 +59,15 @@ function Instructors() {
 
   return (
     <>
-      <TextField
+      <Autocomplete
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
-        label="Pesquise por pessoa instrutora"
+        options={searchbarResults}
+        renderInput={params => (
+          <TextField
+          label="Pesquise por professor"
+          {...params}
+          />
+        )}
       />
       <Divider sx={{ marginBottom: "35px" }} />
       <Box
