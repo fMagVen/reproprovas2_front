@@ -19,6 +19,7 @@ import api, {
   TeacherDisciplines,
   Test,
   TestByTeacher,
+  searchOptions
 } from "../services/api";
 
 function Instructors() {
@@ -29,16 +30,16 @@ function Instructors() {
     TestByTeacher[]
   >([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const[searchbarResults, setSearchbarResults] = useState<string[]>([])
+  const[searchbarResults, setSearchbarResults] = useState<searchOptions[]>([])
   console.log(teachersDisciplines)
 
   function formatTests(tests: TestByTeacher[]){
-    const resultsArr: string[] = []
+    const resultsArr: searchOptions[] = []
     tests.forEach(term=>{
       let str1: string = `${term.teacher.name} - `
       term.tests.forEach(test=>{
           let str2: string = str1 + `${test.category.name} - ${test.name}`
-          resultsArr.push(str2)
+          resultsArr.push({label: str2, id: test.id})
         })
     })
     setTeachersDisciplines(tests)
@@ -57,11 +58,17 @@ function Instructors() {
     loadPage();
   }, [token]);
 
+  async function getTest(e: any, v: any){
+    const { data: singleTest } = await api.getTest(token as string, v.id);
+    window.location.href = `${singleTest.pdfUrl}`
+  }
+
   return (
     <>
       <Autocomplete
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
         options={searchbarResults}
+        onChange={getTest}
         renderInput={params => (
           <TextField
           label="Pesquise por professor"

@@ -20,6 +20,7 @@ import api, {
   TeacherDisciplines,
   Test,
   TestByDiscipline,
+  searchOptions
 } from "../services/api";
 
 function Disciplines() {
@@ -28,17 +29,16 @@ function Disciplines() {
   const { token } = useAuth();
   const [terms, setTerms] = useState<TestByDiscipline[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const[searchbarResults, setSearchbarResults] = useState<string[]>([])
-  console.log(terms)
+  const[searchbarResults, setSearchbarResults] = useState<searchOptions[]>([])
 
   function formatTests(tests: TestByDiscipline[]){
-    const resultsArr: string[] = []
+    const resultsArr: searchOptions[] = []
     tests.forEach(term=>{
       term.disciplines.forEach(discipline => {
         let str: string = `${discipline.name} - `
         discipline.teacherDisciplines[0].tests.forEach(test=>{
           let str2: string = str + `${test.category.name} - ${test.name} - (${discipline.teacherDisciplines[0].teacher.name})`
-          resultsArr.push(str2)
+          resultsArr.push({label: str2, id: test.id})
         })
       })
     })
@@ -58,11 +58,17 @@ function Disciplines() {
     loadPage();
   }, [token]);
 
+  async function getTest(e: any, v: any){
+    const { data: singleTest } = await api.getTest(token as string, v.id);
+    window.location.href = `${singleTest.pdfUrl}`
+  }
+
   return (
     <>
       <Autocomplete
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
         options={searchbarResults}
+        onChange={getTest}
         renderInput={params => (
           <TextField
           label="Pesquise por disciplina"

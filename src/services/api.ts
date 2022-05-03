@@ -74,6 +74,11 @@ export interface Test {
   category: Category;
 }
 
+export interface searchOptions{
+  label: string,
+  id: number
+}
+
 export type TestByDiscipline = Term & {
   disciplines: Discipline[];
 };
@@ -120,6 +125,11 @@ async function addTest(token: string, form: any){
   return baseAPI.post("/tests", form, config)
 }
 
+async function getTest(token: string, id: number){
+  const config = getConfig(token);
+  return baseAPI.get(`/tests/${id}`, config)
+}
+
 const api = {
   signUp,
   signIn,
@@ -128,7 +138,8 @@ const api = {
   getCategories,
   getDisciplines,
   getTeachersById,
-  addTest
+  addTest,
+  getTest
 };
 
 export default api;
